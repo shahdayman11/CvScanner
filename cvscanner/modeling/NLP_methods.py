@@ -4,6 +4,14 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from collections import defaultdict
+import plotly.express as px
+import plotly.graph_objects as go
+from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
+import plotly.offline as pyo
+import plotly.graph_objs as go
+pyo.init_notebook_mode(connected=True)
+    
 
 def load_category_data(json_file_path):
     """Load the categorized resumes from JSON file"""
@@ -87,7 +95,7 @@ def find_top_categories(text_cv, json_file_path, top_n=5):
         percentage = round(score * 100, 2)  # Convert to percentage and round to 2 decimals
         result.append((category, percentage))
     
-    return result
+    return result,similarities,vectorizer
 
 def find_top_categories_alternative(text_cv, json_file_path, top_n=5):
     """
@@ -194,3 +202,106 @@ def print_formatted_results(results):
         print(f"{i}. {category}: {percentage}%")
     
     return percentage_results
+
+
+
+def visualize_cv_in_trained_space(similarities, documents, categories, input_cv_text, vectorizer=None):
+    """
+    Visualize input CV position within trained CV space using dimensionality reduction
+    
+    Args:
+        similarities: Cosine similarity scores between input CV and all training documents
+        documents: List of all training CV texts
+        categories: List of categories for each training document
+        input_cv_text: The input CV text to visualize
+        vectorizer: Optional pre-fitted vectorizer (if None, creates new one)
+    """
+    
+    # Import plotly offline for Jupyter notebook display
+
+    # Create or use existing vectorizer
+    if vectorizer is None:
+        vectorizer = TfidfVectorizer(max_features=5000, stop_words='english')
+        training_vectors = vectorizer.fit_transform(documents)
+    else:
+        training_vectors = vectorizer.transform(documents)
+    
+    # Transform input CV using the same vectorizer
+    input_cv_vector = vectorizer.transform([input_cv_text])
+    
+    # Combine all vectors for consistent dimensionality reduction
+    all_vectors = np.vstack([training_vectors.toarray(), input_cv_vector.toarray()])
+    
+    # Apply dimensionality reduction
+    print("Reducing dimensions with t-SNE...")
+    
+    # First reduce with PCA for better t-SNE performance
+    pca = PCA(n_components=min(50, all_vectors.shape[1]))
+    reduced_pca = pca.fit_transform(all_vectors)
+    
+    # Use t-SNE for final 2D visualization
+    tsne = TSNE(n_components=2, random_state=42, perplexity=min(30, len(documents)-1))
+    reduced_2d = tsne.fit_transform(reduced_pca)
+    
+    # Separate training points and input CV point
+    training_points = reduced_2d[:-1]  # All except last point
+    input_cv_point = reduced_2d[-1]    # Last point is input CV
+    
+    # Create DataFrame for training data
+    plot_data = pd.DataFrame({
+        'x': training_points[:, 0],
+        'y': training_points[:, 1],
+        'category': categories,
+        'similarity': similarities,
+        'hover_text': [f"Category: {cat}<br>Similarity: {sim:.3f}" 
+                      for cat, sim in zip(categories, similarities)],
+        'size': [sim * 20 + 5 for sim in similarities]  # Size based on similarity
+    })
+    
+    # Create the main scatter plot for training data
+    fig = px.scatter(
+        plot_data, 
+        x='x', 
+        y='y',
+        color='category',
+        hover_data={'hover_text': True, 'x': False, 'y': False, 'category': False},
+        size='size',
+        title='Input CV Position in Trained CV Space',
+        labels={'x': 't-SNE Dimension 1', 'y': 't-SNE Dimension 2'},
+        opacity=0.7
+    )
+    
+    # Add the input CV as a special point
+    fig.add_trace(go.Scatter(
+        x=[input_cv_point[0]],
+        y=[input_cv_point[1]],
+        mode='markers+text',
+        marker=dict(
+            size=20,
+            color='black',
+            symbol='star',
+            line=dict(width=2, color='white')
+        ),
+        name='Input CV',
+        hoverinfo='text',
+        hovertext='Your Input CV',
+        text='Your CV',
+        textposition='middle center'
+    ))
+    
+    # Update layout
+    fig.update_layout(
+        hovermode='closest',
+        showlegend=True,
+        width=900,
+        height=700,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+    )
+    
+    print("Visualization ready! Showing plot...")
+    
+    # Use offline iplot for Jupyter notebook display
+    pyo.iplot(fig)
+    
+    return fig, reduced_2d
+
