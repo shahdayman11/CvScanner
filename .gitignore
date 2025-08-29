@@ -1,5 +1,6 @@
 cv_env
 =4.2.0
+notebooks/best_cv_classifier.pth
 # Data
 
 # Mac OS-specific storage files
