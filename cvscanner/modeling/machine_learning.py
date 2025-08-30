@@ -94,10 +94,11 @@ sil_scores = []
 for k in k_candidates:
     km = KMeans(n_clusters=k, random_state=42, n_init=10)
     labs = km.fit_predict(X_all)
-    if len(set(labs)) > 1:
-        sil = float(silhouette_score(X_all, labs, metric='cosine'))
-    else:
-        sil = -1.0
+    #==
+    if len(set(labs)) > 1:  # only calculate if at least 2 clusters
+    sil = float(silhouette_score(X_all, labs, metric='cosine'))
+else:
+    sil = 0.0  # fallback if only one cluster
     sil_scores.append(sil)
 
 best_k = int(k_candidates[int(np.argmax(sil_scores))])
