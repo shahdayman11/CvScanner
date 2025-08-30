@@ -111,7 +111,7 @@ with tab3:
 
 with tab4:
     st.subheader("EDA & Insights from Data")
-    df = pd.read_csv("data/processed/cleanedV2.csv")
+    df = pd.read_csv(CLEANED_DATA)
 
     col1, col2 = st.columns(2)
     with col1:
@@ -126,4 +126,4 @@ with tab4:
         skill_counts = pd.Series(all_skills).value_counts().head(15)
         fig, ax = plt.subplots(figsize=(8,6))
         sns.barplot(x=skill_counts.values, y=skill_counts.index, ax=ax)
-        st.pyplot(fig)
+        st.pyplot(fig)  
