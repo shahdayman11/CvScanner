@@ -210,12 +210,17 @@ def predict_cv_category(cv_text, model, label_encoder, tokenizer, device='cpu'):
 # ---------------- LOAD TRAINED MODEL ----------------
 def load_trained_model(model_path):
     """
-    Load a trained model for inference safely
+    Load a trained model for inference safely with PyTorch >=2.6
     """
+    import numpy as np
+    from sklearn.preprocessing import LabelEncoder
     from torch.serialization import safe_globals
 
-    with safe_globals([LabelEncoder]):
-        checkpoint = torch.load(model_path, map_location='cpu')
+    # Add safe globals that may exist in the checkpoint
+    allowed_globals = [LabelEncoder, np._core.multiarray._reconstruct]
+
+    with safe_globals(allowed_globals):
+        checkpoint = torch.load(model_path, map_location='cpu', weights_only=False)
 
     num_classes = checkpoint['num_classes']
     model_name = checkpoint.get('tokenizer_name', 'bert-base-uncased')
