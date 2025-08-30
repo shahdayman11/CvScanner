@@ -107,7 +107,7 @@ with tab2:
         if example_text.strip():
             results = nlp.enhanced_find_top_categories(example_text, JSON_FILE, top_n=5)
             nlp.print_formatted_results(results)
-            st.write(results)
+            #st.write(results)
 
 # ------------------- Tab 3 -------------------
 with tab3:
