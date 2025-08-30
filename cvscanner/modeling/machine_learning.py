@@ -18,6 +18,7 @@ from sklearn.svm import LinearSVC
 from sklearn.cluster import KMeans
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import normalize
+import streamlit as st#--
 
 try:
     df
@@ -76,13 +77,14 @@ metrics_df = pd.DataFrame({
     "Metric": ["Accuracy", "F1 (macro)"],
     "Score": [acc, f1_macro]
 })
-display(metrics_df)
-print(report)
+st.dataframe(metrics_df)#--
+st.text(report)#--
 
 
 student_skills = "python sql machine learning pandas scikit-learn"
 predicted_category = clf.predict([student_skills])[0]
-print("Predicted Career Path:", predicted_category)
+#print("Predicted Career Path:", predicted_category)
+st.write("**Predicted Career Path:**", predicted_category)
 
 vec = TfidfVectorizer(ngram_range=(1,2), min_df=2, max_df=0.9, sublinear_tf=True)
 X_all = vec.fit_transform(df["text"].values)
@@ -113,9 +115,11 @@ def top_terms_per_cluster(vec, km, n_terms=13):
     terms = vec.get_feature_names_out()
     order_centroids = km.cluster_centers_.argsort()[:, ::-1]
     for i in range(km.n_clusters):
-        print(f"\nCluster {i}:")
+       # print(f"\nCluster {i}:")
+        st.write(f"### Cluster {i}")
         for ind in order_centroids[i, :n_terms]:
-            print("  ", terms[ind])
+            #print("  ", terms[ind])
+             st.write(" -", terms[ind])
 
 top_terms_per_cluster(vec, kmeans, n_terms=13)
 
@@ -149,9 +153,12 @@ top_categories = (
 top_categories.columns = ["Recommended Category", "Votes"]
 
 
-print("Example skills:", example_skills)
-print("\nTop recommended categories based on similarity:")
-print(top_categories)
+#print("Example skills:", example_skills)
+st.write("**Example skills:**", example_skills)
+#print("\nTop recommended categories based on similarity:")
+st.write("### Top recommended categories based on similarity")
+#print(top_categories)
+st.dataframe(top_categories)
 
 
 summary = {
@@ -159,3 +166,5 @@ summary = {
     "example_input": example_skills,
     "recommendations": top_categories.to_dict(orient="records"),
 }
+
+st.json(summary)
