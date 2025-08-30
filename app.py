@@ -68,8 +68,8 @@ with tab1:
 
             # --- Deep Learning Prediction ---
             st.subheader("Deep Learning Model (BERT)")
-            model, label_encoder, tokenizer = deeplearning.load_trained_model(DL_MODEL_PATH)
-            pred_cat, confidence, top_preds = deeplearning.predict_cv_category(
+            model, label_encoder, tokenizer = DeepLearningModel.load_trained_model(DL_MODEL_PATH)
+            pred_cat, confidence, top_preds = DeepLearningModel.predict_cv_category(
                 text, model, label_encoder, tokenizer
             )
             st.write(f"**Predicted Career Path:** {pred_cat} ({confidence*100:.2f}%)")
