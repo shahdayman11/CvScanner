@@ -16,4 +16,5 @@ streamlit
 pdfplumber
 python-docx
 seaborn
+deeplearning
 -e.
