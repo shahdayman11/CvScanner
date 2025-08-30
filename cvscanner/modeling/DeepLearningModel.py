@@ -8,6 +8,7 @@ from sklearn.model_selection import train_test_split
 import pandas as pd
 import numpy as np
 import json
+import streamlit as st
 
 class CVClassifier(nn.Module):
     def __init__(self, model_name='bert-base-uncased', num_classes=10, dropout_rate=0.3):
@@ -107,8 +108,10 @@ def train_deep_learning_model(json_file_path, model_name='bert-base-uncased',
     encoded_labels = label_encoder.fit_transform(labels)
     num_classes = len(label_encoder.classes_)
     
-    print(f"Found {len(texts)} resumes across {num_classes} categories")
-    print("Categories:", label_encoder.classes_)
+    #print(f"Found {len(texts)} resumes across {num_classes} categories")
+    #print("Categories:", label_encoder.classes_)
+    st.write(f"Found {len(texts)} resumes across {num_classes} categories")
+    st.write("Categories:", list(label_encoder.classes_))
     
     # Split data
     train_texts, val_texts, train_labels, val_labels = train_test_split(
@@ -160,7 +163,8 @@ def train_deep_learning_model(json_file_path, model_name='bert-base-uncased',
             
             # Print progress
             if batch_idx % 10 == 0:
-                print(f'Epoch {epoch+1}, Batch {batch_idx}, Loss: {loss.item():.4f}')
+                #print(f'Epoch {epoch+1}, Batch {batch_idx}, Loss: {loss.item():.4f}')
+                st.text(f'Epoch {epoch+1}, Batch {batch_idx}, Loss: {loss.item():.4f}')
         
         # Validation
         model.eval()
@@ -186,10 +190,15 @@ def train_deep_learning_model(json_file_path, model_name='bert-base-uncased',
         avg_train_loss = total_loss / len(train_loader)
         avg_val_loss = val_loss / len(val_loader)
         
-        print(f'Epoch {epoch+1}/{num_epochs}, '
+        """print(f'Epoch {epoch+1}/{num_epochs}, '
               f'Train Loss: {avg_train_loss:.4f}, '
               f'Val Loss: {avg_val_loss:.4f}, '
-              f'Accuracy: {accuracy:.2f}%')
+              f'Accuracy: {accuracy:.2f}%')"""
+        
+        st.write(f'**Epoch {epoch+1}/{num_epochs}** | '
+         f'Train Loss: {avg_train_loss:.4f} | '
+         f'Val Loss: {avg_val_loss:.4f} | '
+         f'Accuracy: {accuracy:.2f}%')
         
         # Save best model
         if accuracy > best_accuracy:
@@ -204,9 +213,13 @@ def train_deep_learning_model(json_file_path, model_name='bert-base-uncased',
                 'tokenizer_name': model_name,
                 'num_classes': num_classes
             }, 'best_cv_classifier.pth')
-            print(f"Saved new best model with accuracy: {accuracy:.2f}%")
+            #print(f"Saved new best model with accuracy: {accuracy:.2f}%")
+            st.success(f"Saved new best model with accuracy: {accuracy:.2f}%")
+
     
-    print(f"Training complete! Best accuracy: {best_accuracy:.2f}%")
+   # print(f"Training complete! Best accuracy: {best_accuracy:.2f}%")
+    st.success(f"Training complete! Best accuracy: {best_accuracy:.2f}%")
+
     return model, label_encoder, tokenizer
 
 def predict_cv_category(cv_text, model, label_encoder, tokenizer, device='cpu'):
