@@ -22,7 +22,9 @@ from sklearn.preprocessing import normalize
 try:
     df
 except NameError:
-    df = pd.read_csv("/content/cleanedV2.csv")
+    #df = pd.read_csv("/content/cleanedV2.csv")
+    df = pd.read_csv("data/processed/cleanedV2.csv")
+
 
 # Ensure Skills is a list
 def parse_skills(x):
