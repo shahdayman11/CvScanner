@@ -12,7 +12,7 @@ ruff
 scikit-learn
 tqdm
 typer
--e 
 streamlit
 pdfplumber
-python-docx.
+python-docx
+-e.
