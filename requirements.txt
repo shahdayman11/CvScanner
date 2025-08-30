@@ -16,5 +16,8 @@ streamlit
 pdfplumber
 python-docx
 seaborn
-deeplearning
+torch
+torchvision
+torchaudio
+transformers
 -e.
