@@ -15,4 +15,5 @@ typer
 streamlit
 pdfplumber
 python-docx
+seaborn
 -e.
