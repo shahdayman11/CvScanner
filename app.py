@@ -13,9 +13,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Import your models and methods from the repo
-from cvscanner.modeling import deeplearning
+from cvscanner.modeling import DeepLearningModel
 from cvscanner.modeling import NLP_methods as nlp
-from cvscanner.modeling import ML_model as ml
+from cvscanner.modeling import machine_learning as ml
 
 # -------------------
 # PATHS (adjust to your repo structure)
