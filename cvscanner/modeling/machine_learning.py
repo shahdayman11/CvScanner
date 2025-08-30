@@ -18,6 +18,7 @@ from sklearn.svm import LinearSVC
 from sklearn.cluster import KMeans
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import normalize
+from sklearn.metrics import silhouette_score
 import streamlit as st#--
 
 try:
