@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 import gdown
+import PyPDF2
 
 # Import your models and methods from the repo
 from cvscanner.modeling import DeepLearningModel
@@ -14,7 +15,7 @@ from cvscanner.modeling import machine_learning as ml
 # -------------------
 JSON_FILE = "models/grouping.json"       # for NLP
 DL_MODEL_PATH = "models/best_cv_classifier.pth"  # deep learning model
-CLEANED_DATA = "data/cleanedV2.csv"      # for ML/EDA
+CLEANED_DATA = "data/processed/cleanedV2.csv"  # for ML/EDA
 # -------------------
 
 # Ensure models folder exists
@@ -22,13 +23,13 @@ os.makedirs("models", exist_ok=True)
 
 # Download the model from Google Drive if missing
 if not os.path.exists(DL_MODEL_PATH):
-    file_id = "1lf3ggGMJHN-z75Nlkk_15QnvoxgexOJ4"
+    file_id = "1lf3ggGMJHN-z75Nlkk_15QnvoxgexOJ4"  # Your model file ID
     url = f"https://drive.google.com/uc?id={file_id}"
     gdown.download(url, DL_MODEL_PATH, quiet=False)
 
 # Streamlit page setup
 st.set_page_config(page_title="Smart Career Guidance", layout="wide")
-st.title(" Smart Career Guidance & Recruitment System")
+st.title("Smart Career Guidance & Recruitment System")
 
 # Tabs
 tab1, tab2, tab3, tab4 = st.tabs(
@@ -38,26 +39,27 @@ tab1, tab2, tab3, tab4 = st.tabs(
 # ------------------- Tab 1 -------------------
 with tab1:
     st.subheader("Upload your CV or paste text")
-    
     uploaded_file = st.file_uploader("Upload CV (txt/pdf)", type=["txt", "pdf"])
     user_input = st.text_area("Or paste your CV text here:")
 
     # Function to extract text from PDF or TXT
-    import PyPDF2
     def extract_text(file):
         if file.type == "application/pdf":
             pdf_reader = PyPDF2.PdfReader(file)
             text = ""
             for page in pdf_reader.pages:
-                text += page.extract_text() + "\n"
+                page_text = page.extract_text()
+                if page_text:
+                    text += page_text + "\n"
             return text
         else:  # assume plain text
             return file.read().decode("utf-8")
 
     if st.button("Analyze CV"):
+        text = ""
         if uploaded_file is not None:
             text = extract_text(uploaded_file)
-        else:
+        elif user_input.strip():
             text = user_input
 
         if not text.strip():
@@ -119,11 +121,11 @@ with tab3:
 # ------------------- Tab 4 -------------------
 with tab4:
     st.subheader("EDA & Insights from Data")
-    df = pd.read_csv("data/processed/cleanedV2.csv")
+    df = pd.read_csv(CLEANED_DATA)
 
     col1, col2 = st.columns(2)
     with col1:
-        st.write(" Job Categories Distribution")
+        st.write("Job Categories Distribution")
         fig, ax = plt.subplots(figsize=(8,6))
         sns.countplot(y=df["Category"], order=df["Category"].value_counts().index, ax=ax)
         st.pyplot(fig)
