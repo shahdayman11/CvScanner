@@ -22,4 +22,5 @@ torchaudio
 transformers
 plotly
 PyPDF2
+gdown
 -e.
