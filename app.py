@@ -119,6 +119,7 @@ with tab3:
         st.success(f"Predicted Career Path: {pred}")
 
 # ------------------- Tab 4 -------------------
+# ------------------- Tab 4 -------------------
 with tab4:
     st.subheader("EDA & Insights from Data")
     df = pd.read_csv(CLEANED_DATA)
@@ -137,3 +138,19 @@ with tab4:
         fig, ax = plt.subplots(figsize=(8,6))
         sns.barplot(x=skill_counts.values, y=skill_counts.index, ax=ax)
         st.pyplot(fig)
+
+    # ------------------- WordCloud -------------------
+    st.write("Skills WordCloud")
+    if all_skills:  # make sure there are skills
+        from wordcloud import WordCloud
+
+        skill_text = " ".join(all_skills)
+        wordcloud = WordCloud(width=800, height=400, background_color='white').generate(skill_text)
+
+        fig_wc, ax_wc = plt.subplots(figsize=(15,7))
+        ax_wc.imshow(wordcloud, interpolation='bilinear')
+        ax_wc.axis('off')
+        st.pyplot(fig_wc)
+    else:
+        st.info("No skills found to generate WordCloud.")
+
