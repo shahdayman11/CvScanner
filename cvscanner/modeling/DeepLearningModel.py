@@ -265,7 +265,8 @@ def load_trained_model(model_path, model_name='bert-base-uncased'):
     """
     Load a trained model for inference
     """
-    checkpoint = torch.load(model_path, map_location='cpu')
+    with torch.serialization.safe_globals([LabelEncoder]):
+        checkpoint = torch.load(model_path, map_location='cpu')
     
     # Recreate model architecture
     num_classes = checkpoint['num_classes']
