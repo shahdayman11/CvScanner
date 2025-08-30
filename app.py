@@ -96,7 +96,7 @@ with tab3:
 
 with tab4:
     st.subheader("EDA & Insights from Data")
-    df = pd.read_csv(CLEANED_DATA)
+    df = pd.read_csv("data/processed/cleanedV2.csv")
 
     col1, col2 = st.columns(2)
     with col1:
