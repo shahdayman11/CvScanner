@@ -20,4 +20,5 @@ torch
 torchvision
 torchaudio
 transformers
+plotly
 -e.
