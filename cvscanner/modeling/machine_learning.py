@@ -96,7 +96,7 @@ for k in k_candidates:
     labs = km.fit_predict(X_all)
     #==
     if len(set(labs)) > 1:  # only calculate if at least 2 clusters
-    sil = float(silhouette_score(X_all, labs, metric='cosine'))
+        sil = float(silhouette_score(X_all, labs, metric='cosine'))
 else:
     sil = 0.0  # fallback if only one cluster
     sil_scores.append(sil)
